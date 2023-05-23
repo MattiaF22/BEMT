@@ -1,7 +1,7 @@
 import math
 import numpy as np
 import pandas as pd
-import aeropy.xfoil_module
+from AeroPy_submodule.aeropy import xfoil_module
 from scipy.interpolate import interp1d
 from scipy.optimize import fsolve
 import functions
@@ -35,14 +35,14 @@ Interp_functions_Cl = {}
 Interp_functions_Cd = {}
 
 for Re in Re_ls :
-    N=21
+    N=151
     alfa_ls = np.linspace(0,15,N)
     alfa_values = []
     cl_values=[] 
     cd_values=[]
     #Create Polar file for each Reynolds number
-    aeropy.xfoil_module.call('naca0012', alfas=alfa_ls, output='Polar', Reynolds=Re, Mach=0, 
-                         plots=False, NACA=True, GDES=False,  iteration=50, flap=None, PANE=False, NORM=True) 
+    xfoil_module.call('naca0012', alfas=alfa_ls, output='Polar', Reynolds=Re, Mach=0, 
+                         plots=False, NACA=True, GDES=False,  iteration=100, flap=None, PANE=False, NORM=True) 
     
     
     #Take the data from these files and save them in a dictionary
