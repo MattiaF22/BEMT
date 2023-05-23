@@ -1,0 +1,3 @@
+[submodule "AeroPy_submodule"]
+	path = AeroPy_submodule
+	url = https://github.com/leal26/AeroPy.git
