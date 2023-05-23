@@ -12,8 +12,8 @@ import functions
 R=0.125            #radius
 R_hub=0.016        #hub radius
 c=0.025            #chord
-Theta=25           #blade pitch angle
-V_inf=5           #rate of climb
+Theta=10           #blade pitch angle
+V_inf=1.77         #rate of climb
 n=100              #frequency
 B=2                #blades
 rho=1.225          #density
@@ -41,8 +41,8 @@ for Re in Re_ls :
     cl_values=[] 
     cd_values=[]
     #Create Polar file for each Reynolds number
-    xfoil_module.call('naca0012', alfas=alfa_ls, output='Polar', Reynolds=Re, Mach=0, 
-                         plots=False, NACA=True, GDES=False,  iteration=100, flap=None, PANE=False, NORM=True) 
+    #xfoil_module.call('naca0012', alfas=alfa_ls, output='Polar', Reynolds=Re, Mach=0, 
+    #                     plots=False, NACA=True, GDES=False,  iteration=100, flap=None, PANE=False, NORM=True) 
     
     
     #Take the data from these files and save them in a dictionary
@@ -77,43 +77,32 @@ for Re in Re_ls :
 #######################################################################################################################################################
 
 
-df = pd.DataFrame(columns=['r_ad','Reynolds', 'alfa', 'a', 'a_prime','dCT_dr_ad', 'dCP_dr_ad' , 'J_calculated' ])
+df = pd.DataFrame(columns=['N_it','r_ad','Reynolds', 'alfa', 'a', 'a_prime','dCT_dr_ad', 'dCP_dr_ad' , 'J_calculated', 'real J'])
 
-iterations=20
-a_new=np.zeros(M)
-a_prime_new=np.zeros(M)
+iterations=200
+a=np.zeros(M)
+a_prime=np.zeros(M)
 for k in range(iterations):
-    a=a_new
-    a_prime=a_prime_new
     alfa_seq=[]
-    a_seq=[]
+    inflow_angle_seq=[]
     
     for i in range(M) : #for each r_ad there is a Reynolds number
         r_ad=r_ad_ls[i]
-        Re = int(Re_ls[i])
+        Re = Re_ls[i]
         Solidity = B*c/(2*math.pi*r_ad*R)
         inflow_angle= math.atan((V_inf*(1+a[i]))/(Omega*r_ad*R*(1-a_prime[i])))*180/math.pi
         alfa=Theta-inflow_angle
-        alfa_seq.append(alfa)
         Cl = Interp_functions_Cl[Re](alfa)
         Cd = Interp_functions_Cd[Re](alfa)
-        inflow_angle = math.radians(Theta - alfa)
+        inflow_angle = math.radians(inflow_angle)
         lambda1 = Cl*math.cos(inflow_angle)-Cd*math.sin(inflow_angle)
         lambda2 = Cl*math.sin(inflow_angle)+Cd*math.cos(inflow_angle)
-        z=Solidity*lambda1/(4*(math.sin(inflow_angle))**2)
-        a_c = z/(1-z)
-        a_seq.append(a_c)
-        a_new[i]=a_c
-        q=Solidity*lambda2/(2*math.sin(2*inflow_angle))
-        a_prime_c = q/(1+q)
-        a_prime_new[i]=a_prime_c
-        #dCT_dr_ad = float(functions.solve_dCT_dr_ad(Solidity,lambda1,r_ad,a_prime_c,inflow_angle))
-        #dCP_dr_ad = float(functions.solve_dCP_dr_ad(Solidity,lambda2,r_ad,a_prime_c,inflow_angle))
-        #J_calculated = float(functions.solve_J_calculated(r_ad,a_prime_c,a_c,inflow_angle))
-    print(alfa_seq)
-    print(a_seq)
-  
-        #df.loc[i] = [r_ad,Re, alfa, a, a_prime,dCT_dr_ad, dCP_dr_ad ,J_calculated ]
-    #print(df)
+        a[i] = functions.solve_a(Solidity,lambda1,inflow_angle)
+        a_prime[i] = functions.solve_a_prime(Solidity,lambda2,inflow_angle)
+        dCT_dr_ad = functions.solve_dCT_dr_ad(Solidity,lambda1,r_ad,a_prime[i],inflow_angle)
+        dCP_dr_ad = functions.solve_dCP_dr_ad(Solidity,lambda2,r_ad,a_prime[i],inflow_angle)
+        J_calculated = functions.solve_J_calculated(r_ad,a_prime[i],a[i],inflow_angle)  
+        df.loc[i] = [k+1,r_ad,Re, alfa, a[i], a_prime[i],dCT_dr_ad, dCP_dr_ad ,J_calculated, J]
+    print(df)
 
 
