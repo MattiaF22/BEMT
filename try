@@ -1,0 +1,34 @@
+import functions
+import pandas as pd
+import numpy as np
+import math 
+
+r_ad=0.76
+alfa_seq=np.arange(-2,12+2,2)
+Cl_seq=np.array([-0.219, 0 , 0.219, 0.438, 0.657, 0.877, 1.096, 1.315])
+Cd_seq=np.array([0.0099, 0.0087, 0.0084, 0.0091, 0.0108, 0.0134, 0.0171, 0.0217])
+inflow_angle_seq=np.array([27,25,23,21,19,17,15,13])*3.14/180
+Solidity=0.041
+df = pd.DataFrame(columns=['alfa','Cl', 'Cd', 'lambda1','lambda2', 'a', 'a_prime', 'dCP_dr_ad', 'dCP_dr_ad' , 'J_calculated' ])
+
+for i in range(8):
+    alfa=alfa_seq[i]
+    inflow_angle=inflow_angle_seq[i]
+    Cl=Cl_seq[i]
+    Cd=Cd_seq[i]
+    lambda1 = Cl*math.cos(inflow_angle)-Cd*math.sin(inflow_angle)
+    lambda2 = Cl*math.sin(inflow_angle)+Cd*math.cos(inflow_angle)
+    z=Solidity*lambda1/(4*(math.sin(inflow_angle))**2)
+    a = z/(1-z)
+    a_prime=functions.solve_a_prime(Solidity,lambda2,inflow_angle)
+    dCT_dr_ad = float(functions.solve_dCT_dr_ad(Solidity,lambda1,r_ad,a_prime,inflow_angle))
+    dCP_dr_ad = float(functions.solve_dCP_dr_ad(Solidity,lambda2,r_ad,a_prime,inflow_angle))
+    J_calculated = float(functions.solve_J_calculated(r_ad,a_prime,a,inflow_angle))
+
+    
+    df.loc[i]=[alfa,Cl,Cd,lambda1,lambda2,a,a_prime,dCT_dr_ad,dCP_dr_ad,J_calculated]
+print(df)
+
+
+
+# print(a_c)
