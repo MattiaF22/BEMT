@@ -77,9 +77,9 @@ for Re in Re_ls :
 #######################################################################################################################################################
 
 
-df = pd.DataFrame(columns=['N_it','r_ad','Reynolds', 'alfa', 'a', 'a_prime','dCT_dr_ad', 'dCP_dr_ad' , 'J_calculated', 'real J'])
+df = pd.DataFrame(columns=['N_it','r_ad','Reynolds', 'alfa', 'inflow', 'Theta' ,'a', 'a_prime','dCT_dr_ad', 'dCP_dr_ad' , 'J_calculated', 'real J'])
 
-iterations=200
+iterations=20
 a=np.zeros(M)
 a_prime=np.zeros(M)
 for k in range(iterations):
@@ -100,6 +100,9 @@ for k in range(iterations):
         a_prime[i] = functions.solve_a_prime(Solidity,lambda2,inflow_angle)
         dCT_dr_ad = functions.solve_dCT_dr_ad(Solidity,lambda1,r_ad,a_prime[i],inflow_angle)
         dCP_dr_ad = functions.solve_dCP_dr_ad(Solidity,lambda2,r_ad,a_prime[i],inflow_angle)
-        J_calculated = functions.solve_J_calculated(r_ad,a_prime[i],a[i],inflow_angle)  
-        df.loc[i] = [k+1,r_ad,Re, alfa, a[i], a_prime[i],dCT_dr_ad, dCP_dr_ad ,J_calculated, J]
+        J_calculated = functions.solve_J_calculated(r_ad,a_prime[i],a[i],inflow_angle)
+        alfa="{:.2f}".format(alfa)
+        Theta="{:.2f}".format(Theta)
+        inflow_angle="{:.2f}".format(math.degrees(inflow_angle))  
+        df.loc[i] = [k+1,r_ad,Re, alfa, inflow_angle,Theta, a[i], a_prime[i],dCT_dr_ad, dCP_dr_ad ,J_calculated, J]
     print(df)

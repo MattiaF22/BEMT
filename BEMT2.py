@@ -4,6 +4,8 @@ import pandas as pd
 from AeroPy_submodule.aeropy import xfoil_module
 from scipy.interpolate import interp1d
 from scipy.optimize import fsolve
+from scipy.integrate import simps
+from matplotlib import pyplot as plt
 import functions
 
 #########################################################################################################################
@@ -13,15 +15,16 @@ R=0.125            #radius
 R_hub=0.016        #hub radius
 c=0.025            #chord
 Theta=10           #blade pitch angle
-V_inf=30            #rate of climb
-n=100              #frequency
+V_inf=1.77         #rate of climb
+RPM=6000           #rotations per minute
+n=RPM/60           #frequency
 B=2                #blades
 rho=1.225          #density
 mu=1.789e-5        #dynamic viscosity
 Omega=n*2*math.pi  #tip velocity
 D=2*R              #diameter
 J=V_inf/ (n*D)     #advance ratio
-alfa_desired=8
+#alfa_desired=8
 
 ####################################################################################################################################
 
@@ -94,14 +97,14 @@ for i in range(M) : #for each r_ad there is a Reynolds number
         alfa=alfa_ls[j]
         Cl = Interp_functions_Cl[Re](alfa)
         Cd = Interp_functions_Cd[Re](alfa)
-        Theta=alfa_desired+(math.atan(V_inf/(Omega*r_ad*R)))*180/math.pi     #iperbolic blade pitch angle distribution in order to have alfa=alfa_desired (without considering inductions)
+        #Theta=alfa_desired+(math.atan(V_inf/(Omega*r_ad*R)))*180/math.pi     #iperbolic blade pitch angle distribution in order to have alfa=alfa_desired (without considering inductions)
         inflow_angle = math.radians(Theta - alfa)
         lambda1 = Cl*math.cos(inflow_angle)-Cd*math.sin(inflow_angle)
         lambda2 = Cl*math.sin(inflow_angle)+Cd*math.cos(inflow_angle)
         a = functions.solve_a(Solidity,lambda1,inflow_angle)
         a_ls.append(a)
         a_prime = functions.solve_a_prime(Solidity,lambda2,inflow_angle)
-        a_prime_ls.append(a)
+        a_prime_ls.append(a_prime)
         dCT_dr_ad = functions.solve_dCT_dr_ad(Solidity,lambda1,r_ad,a_prime,inflow_angle)
         dCT_dr_ad_ls.append(dCT_dr_ad)
         dCP_dr_ad = functions.solve_dCP_dr_ad(Solidity,lambda2,r_ad,a_prime,inflow_angle)
@@ -117,9 +120,14 @@ for i in range(M) : #for each r_ad there is a Reynolds number
 
     df.loc[i] = [r_ad, Re, alfa, near_J, a, a_prime, dCT_dr_ad, dCP_dr_ad]
 
-print(df)
+    print(df)
+dCT_dr_ad=df["dCT_dr_ad"].values
+dCP_dr_ad=df["dCP_dr_ad"].values
+r_ad=df["r_ad"].values
+CT=simps(dCT_dr_ad,r_ad)
+CP=simps(dCP_dr_ad,r_ad)
+print(CT)
+print(CP)
 
-
-#BEMT DOESN'T WORK FOR V_INF = 1.77, I OBTAIN a_c NEGATIVE VALUES 
 
 
