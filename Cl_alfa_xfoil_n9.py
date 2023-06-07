@@ -30,7 +30,7 @@ Re_ls=rho*(Omega*r_ad_ls*R)*c / mu
 Re_ls=list(map(int, Re_ls))
 
 
-fig, (ax1,ax2)=plt.subplots(2,1)
+fig, (ax1,ax2)=plt.subplots(1,2)
 legend_labels = []
 
 for i in range(0,len(Re_ls)) :
@@ -47,7 +47,7 @@ for i in range(0,len(Re_ls)) :
     
     Reynolds_number=str(Re)
 
-    file_path = 'Polar_naca0012_{}_0.0_15.0'.format(Reynolds_number) 
+    file_path = 'polar_Cl_alfa_xfoil_n9/Polar_naca0012_{}_0.0_15.0'.format(Reynolds_number) 
 
     with open(file_path, 'r') as file:
         lines = file.readlines()
@@ -82,11 +82,11 @@ for i in range(0,len(Re_ls)) :
     alfa_values=np.array(alfa_values)
     ax1.plot(alfa_values,(2*math.pi*alfa_values)/180*math.pi,color="red")
 
-    
-    plt.show()
+    plt.show()     #INSERT BREAKPOINT
 
 
-fig, (ax1,ax2)=plt.subplots(2,1)
+
+fig, (ax1,ax2)=plt.subplots(1,2)
 
 Re_ls=[134448, 2e5, 5e5, 1e6, 5e6, 1e7]
 for i in range(0,len(Re_ls)) :
@@ -103,7 +103,7 @@ for i in range(0,len(Re_ls)) :
     
     Reynolds_number=str(Re)
 
-    file_path = 'Polar_naca0012_{}_0.0_15.0'.format(Reynolds_number) 
+    file_path = 'polar_Cl_alfa_xfoil_n9/Polar_naca0012_{}_0.0_15.0'.format(Reynolds_number) 
 
     with open(file_path, 'r') as file:
         lines = file.readlines()
@@ -141,6 +141,7 @@ for i in range(0,len(Re_ls)) :
     ax1.plot(alfa_values,(2*math.pi*alfa_values)/180*math.pi,color="red")
 
     
-    plt.show()
+    plt.show()     #INSERT BREAKPOINT
+
 
 

@@ -1,8 +1,8 @@
 import math
 
 #FIND a
-def solve_a(Solidity,lambda1,inflow_angle):
-    k=Solidity*lambda1/(4*(math.sin(inflow_angle))**2)
+def solve_a(Solidity,lambda1,inflow_angle,F):
+    k=Solidity*lambda1/(4*F*(math.sin(inflow_angle))**2)
     a=k/(1-k)
     return a
 
